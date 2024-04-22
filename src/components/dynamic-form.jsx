@@ -6,7 +6,7 @@ import { Send } from '@mui/icons-material';
 import * as yup from 'yup';
 
 const DynamicForm = ({ schema }) => {
-  const sortedSchema = schema.sort((a, b) => a.order - b.order);
+  const sortedSchema = schema.fields.sort((a, b) => a.order - b.order);
 
   const validationSchema = yup.object().shape(
     sortedSchema.reduce((acc, field) => {
@@ -25,7 +25,11 @@ const DynamicForm = ({ schema }) => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Grid container>
+      <Grid
+        container
+        sx={schema?.config?.gridContainer?.sx}
+        spacing={schema?.config?.gridContainer?.spacing}
+      >
         {sortedSchema.map((field) => (
           <Grid
             item
@@ -37,7 +41,6 @@ const DynamicForm = ({ schema }) => {
             xl={field.gridItemProps.xl}
           >
             <Controller
-              // key={field.name}
               name={field.name}
               control={control}
               defaultValue=''
@@ -56,9 +59,7 @@ const DynamicForm = ({ schema }) => {
                         onChange(selectedOption ? selectedOption.id : null);
                       }}
                       options={field.options || []}
-                      getOptionLabel={(option) =>
-                        (option && option.value) || ''
-                      }
+                      getOptionLabel={(option) => option?.value || ''}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -67,7 +68,7 @@ const DynamicForm = ({ schema }) => {
                           variant='outlined'
                           margin='normal'
                           error={!!error}
-                          helperText={error && error.message}
+                          helperText={error?.message}
                         />
                       )}
                     />
@@ -82,7 +83,9 @@ const DynamicForm = ({ schema }) => {
                       variant='outlined'
                       margin='normal'
                       error={!!error}
-                      helperText={error && error.message}
+                      helperText={error?.message}
+                      placeholder={field.placeholder}
+                      type={field.type}
                     />
                   )}
                 </>
@@ -105,29 +108,37 @@ const DynamicForm = ({ schema }) => {
 };
 
 DynamicForm.propTypes = {
-  schema: PropTypes.arrayOf(
-    PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      label: PropTypes.string.isRequired,
-      type: PropTypes.oneOf(['text', 'number', 'autocomplete']).isRequired,
-      placeholder: PropTypes.string,
-      order: PropTypes.number.isRequired,
-      validation: PropTypes.object,
-      gridItemProps: PropTypes.shape({
-        xs: PropTypes.number.isRequired,
-        sm: PropTypes.number.isRequired,
-        md: PropTypes.number.isRequired,
-        lg: PropTypes.number.isRequired,
-        xl: PropTypes.number.isRequired,
+  schema: PropTypes.shape({
+    config: PropTypes.shape({
+      gridContainer: PropTypes.shape({
+        sx: PropTypes.object,
+        spacing: PropTypes.number,
       }),
-      options: PropTypes.arrayOf(
-        PropTypes.shape({
-          id: PropTypes.string.isRequired,
-          value: PropTypes.string.isRequired,
-        })
-      ),
-    })
-  ).isRequired,
+    }),
+    fields: PropTypes.arrayOf(
+      PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
+        type: PropTypes.oneOf(['text', 'number', 'autocomplete']).isRequired,
+        placeholder: PropTypes.string,
+        order: PropTypes.number.isRequired,
+        validation: PropTypes.object,
+        gridItemProps: PropTypes.shape({
+          xs: PropTypes.number.isRequired,
+          sm: PropTypes.number.isRequired,
+          md: PropTypes.number.isRequired,
+          lg: PropTypes.number.isRequired,
+          xl: PropTypes.number.isRequired,
+        }),
+        options: PropTypes.arrayOf(
+          PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            value: PropTypes.string.isRequired,
+          })
+        ),
+      })
+    ).isRequired,
+  }).isRequired,
 };
 
 export default DynamicForm;
