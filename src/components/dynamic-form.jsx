@@ -1,7 +1,15 @@
 import PropTypes from 'prop-types';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { TextField, Button, Autocomplete, Grid } from '@mui/material';
+import {
+  TextField,
+  Button,
+  Autocomplete,
+  Grid,
+  Input,
+  FormControl,
+  FormHelperText,
+} from '@mui/material';
 import { Send } from '@mui/icons-material';
 import * as yup from 'yup';
 
@@ -71,6 +79,25 @@ const DynamicForm = ({ schema }) => {
             />
           )}
         />
+      );
+    }
+
+    if (field.type === 'file') {
+      return (
+        <FormControl fullWidth error={!!error}>
+          <Input
+            type='file'
+            onChange={(e) => onChange(e.target.files[0])}
+            onBlur={onBlur}
+            name={field.name}
+            variant='outlined'
+            inputProps={{
+              accept: 'image/*',
+            }}
+          />
+
+          {error && <FormHelperText>{error?.message}</FormHelperText>}
+        </FormControl>
       );
     }
 
@@ -167,8 +194,13 @@ DynamicForm.propTypes = {
       PropTypes.shape({
         name: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
-        type: PropTypes.oneOf(['text', 'number', 'autocomplete', 'date'])
-          .isRequired,
+        type: PropTypes.oneOf([
+          'text',
+          'number',
+          'autocomplete',
+          'date',
+          'file',
+        ]).isRequired,
         placeholder: PropTypes.string,
         order: PropTypes.number.isRequired,
         validation: PropTypes.object,

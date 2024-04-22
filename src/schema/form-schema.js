@@ -8,6 +8,7 @@ export const schema = {
       lastName: '',
       age: null,
       country: null,
+      fileUpload: null,
     },
     gridContainer: {
       // sx: {
@@ -101,6 +102,30 @@ export const schema = {
       type: 'date',
       order: 5,
       validation: yup.date().required('Date of Birth is required'),
+      gridItemProps: {
+        xs: 12,
+        sm: 12,
+        md: 6,
+        lg: 6,
+        xl: 6,
+      },
+    },
+    {
+      name: 'fileUpload',
+      label: 'File Upload',
+      type: 'file',
+      order: 6,
+      validation: yup
+        .mixed()
+        .required('File upload is required')
+        .test('fileSize', 'File is too large', (value) => {
+          return value ? value.size <= 5242880 : true; // limit: 5MB
+        })
+        .test('fileType', 'Unsupported file type', (value) => {
+          return value
+            ? ['image/jpeg', 'image/png'].includes(value.type)
+            : true; // Allowed file types
+        }),
       gridItemProps: {
         xs: 12,
         sm: 12,
