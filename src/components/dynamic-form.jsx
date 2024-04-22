@@ -130,7 +130,7 @@ const DynamicForm = ({ schema }) => {
             lg={field.gridItemProps.lg}
             xl={field.gridItemProps.xl}
           >
-            <Typography fontWeight={700} mb={1}>
+            <Typography fontWeight={700} mb={0.2}>
               {field.label}
             </Typography>
             <Controller
