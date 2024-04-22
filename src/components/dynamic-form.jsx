@@ -41,6 +41,7 @@ const DynamicForm = ({ schema }) => {
           name={field.name}
           type='date'
           onChange={onChange}
+          size={field?.size || 'medium'}
           onBlur={onBlur}
           value={value || ''}
           // label={field.label}
@@ -69,6 +70,7 @@ const DynamicForm = ({ schema }) => {
               {...params}
               // label={field.label}
               fullWidth
+              size={field?.size || 'medium'}
               variant='outlined'
               error={!!error}
               helperText={error?.message}
@@ -87,6 +89,7 @@ const DynamicForm = ({ schema }) => {
           name={field.name}
           fullWidth
           variant='outlined'
+          size={field?.size || 'medium'}
           inputProps={{
             accept: 'image/*',
           }}
@@ -102,6 +105,7 @@ const DynamicForm = ({ schema }) => {
         onChange={onChange}
         onBlur={onBlur}
         value={value || ''}
+        size={field?.size || 'medium'}
         // label={field.label}
         fullWidth
         variant='outlined'
@@ -201,6 +205,7 @@ DynamicForm.propTypes = {
         placeholder: PropTypes.string,
         order: PropTypes.number.isRequired,
         validation: PropTypes.object,
+        size: PropTypes.string,
         gridItemProps: PropTypes.shape({
           xs: PropTypes.number.isRequired,
           sm: PropTypes.number.isRequired,

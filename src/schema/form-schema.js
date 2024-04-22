@@ -31,6 +31,7 @@ export const schema = {
       placeholder: 'Enter your first name',
       order: 1,
       validation: yup.string().required('First name is required'),
+      size: 'small',
       gridItemProps: {
         xs: 12,
         sm: 12,
@@ -46,6 +47,7 @@ export const schema = {
       placeholder: 'Enter your last name',
       order: 2,
       validation: yup.string().required('Last name is required'),
+      size: 'small',
       gridItemProps: {
         xs: 12,
         sm: 12,
@@ -59,6 +61,7 @@ export const schema = {
       label: 'Age',
       type: 'number',
       placeholder: 'Enter your age',
+      size: 'small',
       order: 3,
       validation: yup
         .number()
@@ -79,8 +82,9 @@ export const schema = {
       label: 'Country',
       type: 'autocomplete',
       placeholder: 'Select your country',
+      size: 'small',
       order: 4,
-      autocomplete: true,
+      // autocomplete: true,
       validation: yup.string().required('Country is required'),
       options: [
         { id: '1', value: 'USA' },
@@ -102,6 +106,7 @@ export const schema = {
       type: 'date',
       order: 5,
       validation: yup.date().required('Date of Birth is required'),
+      size: 'small',
       gridItemProps: {
         xs: 12,
         sm: 12,
@@ -115,6 +120,7 @@ export const schema = {
       label: 'File Upload',
       type: 'file',
       order: 6,
+      size: 'small',
       validation: yup
         .mixed()
         .required('File upload is required')
