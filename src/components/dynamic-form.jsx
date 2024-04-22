@@ -17,10 +17,79 @@ const DynamicForm = ({ schema }) => {
 
   const { control, handleSubmit } = useForm({
     resolver: yupResolver(validationSchema),
+    defaultValues: schema?.config?.defaultValues,
   });
 
   const onSubmit = (data) => {
     console.log('Form data:', data);
+  };
+
+  const getFieldComponent = (
+    field,
+    { onChange, onBlur, value, name },
+    error
+  ) => {
+    if (field.type === 'date') {
+      return (
+        <TextField
+          name={field.name}
+          type='date'
+          onChange={onChange}
+          onBlur={onBlur}
+          value={value || ''}
+          label={field.label}
+          fullWidth
+          variant='outlined'
+          margin='normal'
+          error={!!error}
+          helperText={error?.message}
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+      );
+    }
+
+    if (field.type === 'autocomplete') {
+      return (
+        <Autocomplete
+          value={field.options.find((option) => option.id === value) || null}
+          onChange={(e, selectedOption) => {
+            onChange(selectedOption ? selectedOption.id : null);
+          }}
+          options={field.options || []}
+          getOptionLabel={(option) => option?.value || ''}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={field.label}
+              fullWidth
+              variant='outlined'
+              margin='normal'
+              error={!!error}
+              helperText={error?.message}
+            />
+          )}
+        />
+      );
+    }
+
+    return (
+      <TextField
+        name={name}
+        onChange={onChange}
+        onBlur={onBlur}
+        value={value || ''}
+        label={field.label}
+        fullWidth
+        variant='outlined'
+        margin='normal'
+        error={!!error}
+        helperText={error?.message}
+        placeholder={field.placeholder}
+        type={field.type}
+      />
+    );
   };
 
   return (
@@ -47,62 +116,32 @@ const DynamicForm = ({ schema }) => {
               render={({
                 field: { onChange, onBlur, value, name },
                 fieldState: { error },
-              }) => (
-                <>
-                  {field.type === 'autocomplete' ? (
-                    <Autocomplete
-                      value={
-                        field.options.find((option) => option.id === value) ||
-                        null
-                      }
-                      onChange={(e, selectedOption) => {
-                        onChange(selectedOption ? selectedOption.id : null);
-                      }}
-                      options={field.options || []}
-                      getOptionLabel={(option) => option?.value || ''}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label={field.label}
-                          fullWidth
-                          variant='outlined'
-                          margin='normal'
-                          error={!!error}
-                          helperText={error?.message}
-                        />
-                      )}
-                    />
-                  ) : (
-                    <TextField
-                      name={name}
-                      onChange={onChange}
-                      onBlur={onBlur}
-                      value={value}
-                      label={field.label}
-                      fullWidth
-                      variant='outlined'
-                      margin='normal'
-                      error={!!error}
-                      helperText={error?.message}
-                      placeholder={field.placeholder}
-                      type={field.type}
-                    />
-                  )}
-                </>
-              )}
+              }) =>
+                getFieldComponent(
+                  field,
+                  { onChange, onBlur, value, name },
+                  error
+                )
+              }
             />
           </Grid>
         ))}
       </Grid>
-      <Button
-        type='submit'
-        variant={schema?.config?.submitButton?.variant || 'contained'}
-        color={schema?.config?.submitButton?.color || 'primary'}
-        endIcon={<Send />}
-        sx={{ mt: 2 }}
+      <Grid
+        container
+        display={schema?.config?.submitButton?.display || 'block'}
+        justifyContent={schema?.config?.submitButton?.justifyContent || 'left'}
       >
-        Submit
-      </Button>
+        <Button
+          type='submit'
+          variant={schema?.config?.submitButton?.variant || 'contained'}
+          color={schema?.config?.submitButton?.color || 'primary'}
+          endIcon={<Send />}
+          sx={{ mt: 2 }}
+        >
+          Submit
+        </Button>
+      </Grid>
     </form>
   );
 };
@@ -110,6 +149,7 @@ const DynamicForm = ({ schema }) => {
 DynamicForm.propTypes = {
   schema: PropTypes.shape({
     config: PropTypes.shape({
+      defaultValues: PropTypes.object,
       gridContainer: PropTypes.shape({
         sx: PropTypes.object,
         spacing: PropTypes.number,
@@ -127,7 +167,8 @@ DynamicForm.propTypes = {
       PropTypes.shape({
         name: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
-        type: PropTypes.oneOf(['text', 'number', 'autocomplete']).isRequired,
+        type: PropTypes.oneOf(['text', 'number', 'autocomplete', 'date'])
+          .isRequired,
         placeholder: PropTypes.string,
         order: PropTypes.number.isRequired,
         validation: PropTypes.object,

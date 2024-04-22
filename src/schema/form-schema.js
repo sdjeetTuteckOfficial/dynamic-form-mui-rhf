@@ -3,6 +3,12 @@ import * as yup from 'yup';
 
 export const schema = {
   config: {
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      age: null,
+      country: null,
+    },
     gridContainer: {
       // sx: {
       //   border: '1px solid black',
@@ -57,7 +63,8 @@ export const schema = {
         .number()
         .required('Age is required')
         .positive('Age must be a positive number')
-        .integer('Age must be an integer'),
+        .integer('Age must be an integer')
+        .required('Age is required'),
       gridItemProps: {
         xs: 12,
         sm: 12,
@@ -80,6 +87,20 @@ export const schema = {
         { id: '3', value: 'UK' },
         { id: '4', value: 'Australia' },
       ],
+      gridItemProps: {
+        xs: 12,
+        sm: 12,
+        md: 6,
+        lg: 6,
+        xl: 6,
+      },
+    },
+    {
+      name: 'dateOfBirth',
+      label: 'Date of Birth',
+      type: 'date',
+      order: 5,
+      validation: yup.date().required('Date of Birth is required'),
       gridItemProps: {
         xs: 12,
         sm: 12,
