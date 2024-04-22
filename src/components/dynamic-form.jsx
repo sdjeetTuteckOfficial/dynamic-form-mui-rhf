@@ -6,9 +6,7 @@ import {
   Button,
   Autocomplete,
   Grid,
-  Input,
-  FormControl,
-  FormHelperText,
+  Typography,
 } from '@mui/material';
 import { Send } from '@mui/icons-material';
 import * as yup from 'yup';
@@ -45,10 +43,9 @@ const DynamicForm = ({ schema }) => {
           onChange={onChange}
           onBlur={onBlur}
           value={value || ''}
-          label={field.label}
+          // label={field.label}
           fullWidth
           variant='outlined'
-          margin='normal'
           error={!!error}
           helperText={error?.message}
           InputLabelProps={{
@@ -70,10 +67,9 @@ const DynamicForm = ({ schema }) => {
           renderInput={(params) => (
             <TextField
               {...params}
-              label={field.label}
+              // label={field.label}
               fullWidth
               variant='outlined'
-              margin='normal'
               error={!!error}
               helperText={error?.message}
             />
@@ -84,20 +80,19 @@ const DynamicForm = ({ schema }) => {
 
     if (field.type === 'file') {
       return (
-        <FormControl fullWidth error={!!error}>
-          <Input
-            type='file'
-            onChange={(e) => onChange(e.target.files[0])}
-            onBlur={onBlur}
-            name={field.name}
-            variant='outlined'
-            inputProps={{
-              accept: 'image/*',
-            }}
-          />
-
-          {error && <FormHelperText>{error?.message}</FormHelperText>}
-        </FormControl>
+        <TextField
+          type='file'
+          onChange={(e) => onChange(e.target.files[0])}
+          onBlur={onBlur}
+          name={field.name}
+          fullWidth
+          variant='outlined'
+          inputProps={{
+            accept: 'image/*',
+          }}
+          error={!!error}
+          helperText={error?.message}
+        />
       );
     }
 
@@ -107,10 +102,9 @@ const DynamicForm = ({ schema }) => {
         onChange={onChange}
         onBlur={onBlur}
         value={value || ''}
-        label={field.label}
+        // label={field.label}
         fullWidth
         variant='outlined'
-        margin='normal'
         error={!!error}
         helperText={error?.message}
         placeholder={field.placeholder}
@@ -136,6 +130,9 @@ const DynamicForm = ({ schema }) => {
             lg={field.gridItemProps.lg}
             xl={field.gridItemProps.xl}
           >
+            <Typography fontWeight={700} mb={1}>
+              {field.label}
+            </Typography>
             <Controller
               name={field.name}
               control={control}
