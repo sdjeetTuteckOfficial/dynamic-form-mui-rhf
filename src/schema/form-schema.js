@@ -9,6 +9,12 @@ export const schema = {
       // },
       spacing: 2,
     },
+    submitButton: {
+      display: 'flex',
+      justifyContent: 'right',
+      variant: 'contained',
+      color: 'primary',
+    },
   },
   fields: [
     {

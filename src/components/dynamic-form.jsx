@@ -96,8 +96,8 @@ const DynamicForm = ({ schema }) => {
       </Grid>
       <Button
         type='submit'
-        variant='contained'
-        color='primary'
+        variant={schema?.config?.submitButton?.variant || 'contained'}
+        color={schema?.config?.submitButton?.color || 'primary'}
         endIcon={<Send />}
         sx={{ mt: 2 }}
       >
@@ -113,6 +113,14 @@ DynamicForm.propTypes = {
       gridContainer: PropTypes.shape({
         sx: PropTypes.object,
         spacing: PropTypes.number,
+        display: PropTypes.string,
+      }),
+      submitButton: PropTypes.shape({
+        sx: PropTypes.object,
+        display: PropTypes.string,
+        justifyContent: PropTypes.string,
+        variant: PropTypes.string,
+        color: PropTypes.string,
       }),
     }),
     fields: PropTypes.arrayOf(
