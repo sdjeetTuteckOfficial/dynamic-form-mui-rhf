@@ -8,6 +8,9 @@ import {
   Grid,
   Typography,
 } from '@mui/material';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { Send } from '@mui/icons-material';
 import * as yup from 'yup';
 
@@ -21,7 +24,11 @@ const DynamicForm = ({ schema }) => {
     }, {})
   );
 
-  const { control, handleSubmit } = useForm({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: schema?.config?.defaultValues,
   });
@@ -35,6 +42,28 @@ const DynamicForm = ({ schema }) => {
     { onChange, onBlur, value, name },
     error
   ) => {
+    if (field.type === 'date' && field.muiDatepicker === true) {
+      return (
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker
+            {...field}
+            label={null}
+            sx={{ width: '100%' }}
+            onChange={onChange}
+            format='DD/MM/YYYY'
+            size={field?.size || 'medium'}
+            slotProps={{
+              textField: {
+                size: field?.size || 'medium',
+                error: !!error,
+                helperText: error?.message,
+              },
+            }}
+          />
+        </LocalizationProvider>
+      );
+    }
+
     if (field.type === 'date') {
       return (
         <TextField
@@ -44,7 +73,6 @@ const DynamicForm = ({ schema }) => {
           size={field?.size || 'medium'}
           onBlur={onBlur}
           value={value || ''}
-          // label={field.label}
           fullWidth
           variant='outlined'
           error={!!error}
@@ -119,6 +147,7 @@ const DynamicForm = ({ schema }) => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
+      {console.log('error', errors)}
       <Grid
         container
         sx={schema?.config?.gridContainer?.sx}
@@ -140,7 +169,7 @@ const DynamicForm = ({ schema }) => {
             <Controller
               name={field.name}
               control={control}
-              defaultValue=''
+              // defaultValue={}
               render={({
                 field: { onChange, onBlur, value, name },
                 fieldState: { error },

@@ -8,6 +8,7 @@ export const schema = {
       lastName: '',
       age: null,
       country: null,
+      dateOfBirth: null,
       fileUpload: null,
     },
     gridContainer: {
@@ -104,6 +105,7 @@ export const schema = {
       name: 'dateOfBirth',
       label: 'Date of Birth',
       type: 'date',
+      muiDatepicker: false,
       order: 5,
       validation: yup.date().required('Date of Birth is required'),
       size: 'small',
