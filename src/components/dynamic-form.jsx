@@ -23,11 +23,14 @@ const DynamicForm = ({ schema }) => {
 
   useEffect(() => {
     setLoading(true);
-
     const fetchData = async () => {
       try {
         const promises = schema.fields.map(async (field) => {
-          if (field.type === 'autocomplete' && field.url) {
+          if (
+            field.type === 'autocomplete' &&
+            field.url &&
+            field.isDependent === false
+          ) {
             const response = await axios.get(field.url);
             setFieldOptions((prevOptions) => ({
               ...prevOptions,
@@ -45,6 +48,18 @@ const DynamicForm = ({ schema }) => {
 
     fetchData();
   }, [schema.fields]);
+
+  const fetchChildData = async (parentId, field) => {
+    try {
+      const response = await axios.get(`${field?.childUrl}${parentId}`);
+      setFieldOptions((prevOptions) => ({
+        ...prevOptions,
+        [field.childField]: response.data,
+      }));
+    } catch (error) {
+      console.error('Error fetching child data:', error);
+    }
+  };
 
   const validationSchema = yup.object().shape(
     sortedSchema.reduce((acc, field) => {
@@ -121,7 +136,12 @@ const DynamicForm = ({ schema }) => {
             null
           }
           onChange={(e, selectedOption) => {
-            onChange(selectedOption ? selectedOption.id : null);
+            if (field.hasChild) {
+              fetchChildData(selectedOption.id, field);
+              onChange(selectedOption ? selectedOption.id : null);
+            } else {
+              onChange(selectedOption ? selectedOption.id : null);
+            }
           }}
           options={fieldOptions[field.name] || []}
           // options={field.name || []}

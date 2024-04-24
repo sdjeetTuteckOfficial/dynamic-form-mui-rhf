@@ -86,6 +86,10 @@ export const schema = {
       url: 'http://localhost:3001/api/countries',
       size: 'small',
       order: 4,
+      isDependent: false,
+      hasChild: true,
+      childUrl: 'http://localhost:3001/api/cities?countryId=',
+      childField: 'city',
       // autocomplete: true,
       validation: yup.string().required('Country is required'),
       // options: [
@@ -107,17 +111,14 @@ export const schema = {
       label: 'City',
       type: 'autocomplete',
       placeholder: 'Select your city',
-      url: 'http://localhost:3001/api/cities',
+      isDependent: true,
+      hasChild: false,
+      // parent: 'country', ///add name of parent
+      // url: 'http://localhost:3001/api/cities?countryId=', //send base url
       size: 'small',
       order: 4,
       // autocomplete: true,
       validation: yup.string().required('Country is required'),
-      // options: [
-      //   { id: '1', value: 'USA' },
-      //   { id: '2', value: 'Canada' },
-      //   { id: '3', value: 'UK' },
-      //   { id: '4', value: 'Australia' },
-      // ],
       gridItemProps: {
         xs: 12,
         sm: 12,
