@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -8,6 +9,7 @@ import {
   Grid,
   Typography,
 } from '@mui/material';
+import axios from 'axios';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -16,6 +18,33 @@ import * as yup from 'yup';
 
 const DynamicForm = ({ schema }) => {
   const sortedSchema = schema.fields.sort((a, b) => a.order - b.order);
+  const [fieldOptions, setFieldOptions] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+
+    const fetchData = async () => {
+      try {
+        const promises = schema.fields.map(async (field) => {
+          if (field.type === 'autocomplete' && field.url) {
+            const response = await axios.get(field.url);
+            setFieldOptions((prevOptions) => ({
+              ...prevOptions,
+              [field.name]: response.data,
+            }));
+          }
+        });
+        await Promise.all(promises);
+      } catch (error) {
+        console.error('Error fetching field options:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [schema.fields]);
 
   const validationSchema = yup.object().shape(
     sortedSchema.reduce((acc, field) => {
@@ -24,11 +53,7 @@ const DynamicForm = ({ schema }) => {
     }, {})
   );
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
+  const { control, handleSubmit } = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: schema?.config?.defaultValues,
   });
@@ -87,11 +112,19 @@ const DynamicForm = ({ schema }) => {
     if (field.type === 'autocomplete') {
       return (
         <Autocomplete
-          value={field.options.find((option) => option.id === value) || null}
+          // value={
+          //   fieldOptions[field.name]?.find((option) => option.id === value) ||
+          //   null
+          // }
+          value={
+            fieldOptions[field.name]?.find((option) => option.id === value) ||
+            null
+          }
           onChange={(e, selectedOption) => {
             onChange(selectedOption ? selectedOption.id : null);
           }}
-          options={field.options || []}
+          options={fieldOptions[field.name] || []}
+          // options={field.name || []}
           getOptionLabel={(option) => option?.value || ''}
           renderInput={(params) => (
             <TextField
@@ -146,60 +179,66 @@ const DynamicForm = ({ schema }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      {console.log('error', errors)}
-      <Grid
-        container
-        sx={schema?.config?.gridContainer?.sx}
-        spacing={schema?.config?.gridContainer?.spacing}
-      >
-        {sortedSchema.map((field) => (
+    <>
+      {loading && <h1>Loading</h1>}
+      {!loading && (
+        <form onSubmit={handleSubmit(onSubmit)}>
           <Grid
-            item
-            key={field.name}
-            xs={field.gridItemProps.xs}
-            sm={field.gridItemProps.sm}
-            md={field.gridItemProps.md}
-            lg={field.gridItemProps.lg}
-            xl={field.gridItemProps.xl}
+            container
+            sx={schema?.config?.gridContainer?.sx}
+            spacing={schema?.config?.gridContainer?.spacing}
           >
-            <Typography fontWeight={700} mb={0.2}>
-              {field.label}
-            </Typography>
-            <Controller
-              name={field.name}
-              control={control}
-              // defaultValue={}
-              render={({
-                field: { onChange, onBlur, value, name },
-                fieldState: { error },
-              }) =>
-                getFieldComponent(
-                  field,
-                  { onChange, onBlur, value, name },
-                  error
-                )
-              }
-            />
+            {sortedSchema.map((field) => (
+              <Grid
+                item
+                key={field.name}
+                xs={field.gridItemProps.xs}
+                sm={field.gridItemProps.sm}
+                md={field.gridItemProps.md}
+                lg={field.gridItemProps.lg}
+                xl={field.gridItemProps.xl}
+              >
+                <Typography fontWeight={700} mb={0.2}>
+                  {field.label}
+                </Typography>
+                <Controller
+                  name={field.name}
+                  control={control}
+                  // defaultValue={}
+                  render={({
+                    field: { onChange, onBlur, value, name },
+                    fieldState: { error },
+                  }) =>
+                    getFieldComponent(
+                      field,
+                      { onChange, onBlur, value, name },
+                      error
+                    )
+                  }
+                />
+              </Grid>
+            ))}
           </Grid>
-        ))}
-      </Grid>
-      <Grid
-        container
-        display={schema?.config?.submitButton?.display || 'block'}
-        justifyContent={schema?.config?.submitButton?.justifyContent || 'left'}
-      >
-        <Button
-          type='submit'
-          variant={schema?.config?.submitButton?.variant || 'contained'}
-          color={schema?.config?.submitButton?.color || 'primary'}
-          endIcon={<Send />}
-          sx={{ mt: 2 }}
-        >
-          Submit
-        </Button>
-      </Grid>
-    </form>
+          <Grid
+            container
+            display={schema?.config?.submitButton?.display || 'block'}
+            justifyContent={
+              schema?.config?.submitButton?.justifyContent || 'left'
+            }
+          >
+            <Button
+              type='submit'
+              variant={schema?.config?.submitButton?.variant || 'contained'}
+              color={schema?.config?.submitButton?.color || 'primary'}
+              endIcon={<Send />}
+              sx={{ mt: 2 }}
+            >
+              Submit
+            </Button>
+          </Grid>
+        </form>
+      )}
+    </>
   );
 };
 
