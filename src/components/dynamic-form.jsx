@@ -181,6 +181,7 @@ const DynamicForm = ({ schema }) => {
   return (
     <>
       {loading && <h1>Loading</h1>}
+      {console.log('hello')}
       {!loading && (
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid
