@@ -29,7 +29,7 @@ const DynamicForm = ({ schema }) => {
           if (
             field.type === 'autocomplete' &&
             field.url &&
-            field.isDependent === false
+            field.isParent === true
           ) {
             const response = await axios.get(field.url);
             setFieldOptions((prevOptions) => ({
@@ -51,11 +51,14 @@ const DynamicForm = ({ schema }) => {
 
   const fetchChildData = async (parentId, field) => {
     try {
-      const response = await axios.get(`${field?.childUrl}${parentId}`);
-      setFieldOptions((prevOptions) => ({
-        ...prevOptions,
-        [field.childField]: response.data,
-      }));
+      const promises = field.childDetails.map(async (childField) => {
+        const response = await axios.get(`${childField.childUrl}${parentId}`);
+        setFieldOptions((prevOptions) => ({
+          ...prevOptions,
+          [childField.childField]: response.data,
+        }));
+      });
+      await Promise.all(promises);
     } catch (error) {
       console.error('Error fetching child data:', error);
     }

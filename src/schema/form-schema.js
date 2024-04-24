@@ -86,10 +86,14 @@ export const schema = {
       url: 'http://localhost:3001/api/countries',
       size: 'small',
       order: 4,
-      isDependent: false,
+      isParent: true,
       hasChild: true,
-      childUrl: 'http://localhost:3001/api/cities?countryId=',
-      childField: 'city',
+      childDetails: [
+        {
+          childUrl: 'http://localhost:3001/api/states/filter?countryId=',
+          childField: 'state',
+        },
+      ],
       // autocomplete: true,
       validation: yup.string().required('Country is required'),
       // options: [
@@ -106,35 +110,73 @@ export const schema = {
         xl: 6,
       },
     },
+
+    {
+      name: 'state',
+      label: 'State',
+      type: 'autocomplete',
+      placeholder: 'Select your state',
+      isParent: false,
+      hasChild: true,
+      childDetails: [
+        {
+          childUrl: 'http://localhost:3001/api/cities/filter?stateId=',
+          childField: 'city',
+        },
+        {
+          childUrl: 'http://localhost:3001/api/postalCodes/filter?stateId=',
+          childField: 'postalCode',
+        },
+      ],
+      size: 'small',
+      order: 4,
+      // autocomplete: true,
+      validation: yup
+        .string()
+        .required('State is required or Select a valid country!'),
+      gridItemProps: {
+        xs: 12,
+        sm: 12,
+        md: 6,
+        lg: 6,
+        xl: 6,
+      },
+    },
+    {
+      name: 'postalCode',
+      label: 'Postal Code',
+      type: 'autocomplete',
+      placeholder: 'Select your postal code',
+      isParent: false,
+      hasChild: false,
+      // parent: 'country', ///add name of parent
+      // url: 'http://localhost:3001/api/cities?countryId=', //send base url
+      size: 'small',
+      order: 6,
+      // autocomplete: true,
+      validation: yup.string().required('Postal code is required'),
+      gridItemProps: {
+        xs: 12,
+        sm: 12,
+        md: 6,
+        lg: 6,
+        xl: 6,
+      },
+    },
+
     {
       name: 'city',
       label: 'City',
       type: 'autocomplete',
       placeholder: 'Select your city',
-      isDependent: true,
+      isParent: false,
       hasChild: false,
       // parent: 'country', ///add name of parent
       // url: 'http://localhost:3001/api/cities?countryId=', //send base url
       size: 'small',
-      order: 4,
-      // autocomplete: true,
-      validation: yup.string().required('Country is required'),
-      gridItemProps: {
-        xs: 12,
-        sm: 12,
-        md: 6,
-        lg: 6,
-        xl: 6,
-      },
-    },
-    {
-      name: 'dateOfBirth',
-      label: 'Date of Birth',
-      type: 'date',
-      muiDatepicker: true,
       order: 5,
-      validation: yup.date().required('Date of Birth is required'),
-      size: 'small',
+      // autocomplete: true,
+      validation: yup.string().required('City is required'),
       gridItemProps: {
         xs: 12,
         sm: 12,
@@ -143,11 +185,27 @@ export const schema = {
         xl: 6,
       },
     },
+    // {
+    //   name: 'dateOfBirth',
+    //   label: 'Date of Birth',
+    //   type: 'date',
+    //   muiDatepicker: true,
+    //   order: 5,
+    //   validation: yup.date().required('Date of Birth is required'),
+    //   size: 'small',
+    //   gridItemProps: {
+    //     xs: 12,
+    //     sm: 12,
+    //     md: 6,
+    //     lg: 6,
+    //     xl: 6,
+    //   },
+    // },
     {
       name: 'fileUpload',
       label: 'File Upload',
       type: 'file',
-      order: 6,
+      order: 7,
       size: 'small',
       validation: yup
         .mixed()
